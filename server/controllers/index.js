@@ -1,8 +1,8 @@
 // pull in our models. This will automatically load the index.js from that folder
 const models = require('../models');
 
-// get the Cat model
-const { Cat } = models;
+// get the Cat and dog model
+const { Cat,  Dog } = models;
 
 // Function to handle rendering the index page.
 const hostIndex = async (req, res) => {
@@ -231,6 +231,10 @@ const searchName = async (req, res) => {
   // Otherwise, we got a result and will send it back to the user.
   return res.json({ name: doc.name, beds: doc.bedsOwned });
 };
+
+// A function for making le doggies
+////////////////////////////////
+
 
 /* A function for updating the last cat added to the database.
    Usually database updates would be a more involved process, involving finding
