@@ -234,7 +234,18 @@ const searchName = async (req, res) => {
 
 // A function for making le doggies
 ////////////////////////////////
+const createDog = async(req,res) => {
+  if (!req.body.name || !req.body.breed || !req.body.age) {
+  return res.status(400).json({ error: 'the name and breed and age are all required' });
+   }
 
+     const dogData = {
+    name: `${req.body.firstname} ${req.body.lastname}`,
+    breed: req.body.breed,
+    age: req.body.age,
+  };
+
+  }//end createDog
 
 /* A function for updating the last cat added to the database.
    Usually database updates would be a more involved process, involving finding
