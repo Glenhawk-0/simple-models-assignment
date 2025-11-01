@@ -14,5 +14,29 @@
   <a href="/">Home</a>
   <a href="/page1">Page 1</a>
   <a href="/page2">Page 2</a>
+  <a href="/page4">Page 4</a>
+
+<h2>creat a dog... with magic!!!!</h2>
+  <form action="/createDog" method="POST">
+    <label for="name"> name:</label>
+    <input type="text" name="name" value="">
+    <label for="breed">Breed:</label>
+    <input type="text" name="breed" value="">
+    <label for="age">Age:</label>
+    <input type="number" name="age" value="">
+    <input type="submit" value="Create the Doggy">
+  </form>
+  
+  <br/>
+  <br/>
+  
+  
+<h2>Find a dog by its name and increase the age</h2>
+  <form action="/searchDog" method="GET">
+    <label for="name">Name to search for:</label>
+    <input type="text" name="name" value="">
+    <input type="submit" value="Find the Doggy and increase its age?.. um... its magic">
+  </form>
+
 </body>
 </html>
