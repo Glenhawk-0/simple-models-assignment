@@ -245,7 +245,126 @@ const createDog = async(req,res) => {
     age: req.body.age,
   };
 
-  }//end createDog
+    try {
+    /* newCat is a version of our catData that is database-friendly. If you print it, you will
+       see it has extra information attached to it other than name and bedsOwned. One thing it
+       now has is a .save() function. This function will intelligently add or update the cat in
+       the database. Since we have never saved this cat before, .save() will create a new cat in
+       the database. All calls to the database are async, including .save() so we will await the
+       databases response. If something goes wrong, we will end up in our catch() statement. If
+       not, we will return a 201 to the user with the cat info.
+    */
+   // also gotta make new dog
+   const newDog = new Dog (dogData);
+    await newDog.save();
+    return res.status(201).json({
+      name: newDog.name,
+      beds: newDog.breed,
+      age: newDog.age,
+    });
+  } catch (err) {
+
+        console.log(err);
+    return res.status(500).json({ error: 'failed to create dog' });
+
+  }
+};// end create dog 
+
+
+  //
+  // Function to handle searching a cat by name.
+  const searchDog = async (req, res) => {
+  /* When the user makes a POST request, bodyParser populates req.body with the parameters
+     as we saw in setName() above. In the case of searchName, the user is making a GET request.
+     GET requests do not have a body, but they can have query parameters. bodyParser will also
+     handle these, and store them in req.query instead.
+
+     If the user does not give us a name to search by, throw an error.
+  */
+  if (!req.query.name) {
+    return res.status(400).json({ error: 'Name is required to perform a search' });
+  }
+
+
+
+    try{
+    /* Here we are trying to do the exact same thing we did in host index up
+       above. We want to find the most recently added cat. The only difference
+       here is that we are using the query .sort() function rather than passing
+       the sort in as a part of the 3rd parameter options object. Both work
+       functionally the same. We are just seeing that it can be written in
+       more than one way.
+    */
+    const doc = await Dog.findOne({}).sort({name: req.query.name}).exec();
+
+  
+    if(!doc) {
+    return res.status(404).json({error: 'No dog found'});
+    }
+    Dog.age+= 1 ;
+    await doc.save();
+    return res.json({
+      name: doc.name,
+      breed: doc.breed,
+      age: doc.age,
+    });
+
+  } catch (err) {
+    /* If an error occurs, it means something went wrong with the database. We will
+       give the user a 500 internal server error status code and an error message.
+    */
+    console.log(err);
+    return res.status(500).json({error: 'Something went wrong contacting the database'});
+  }
+
+  }//end searchDog
+
+
+const hostPage4 = async (req, res) => {
+  /* Remember that our database is an entirely separate server from our node
+     code. That means all interactions with it are async, and just because our
+     server is up doesn't mean our database is. Therefore, any time we
+     interact with it, we need to account for scenarios where it is not working.
+     That is why the code below is wrapped in a try/catch statement.
+  */
+  try {
+    /* We want to find all the cats in the Cat database. To do this, we need
+       to make a "query" or a search. Queries in Mongoose are "thenable" which
+       means they work like promises. Since they work like promises, we can also
+       use await/async with them.
+
+       The result of any query will either throw an error, or return zero, one, or
+       multiple "documents". Documents are what our database stores. It is often
+       abbreviated to "doc" or "docs" (one or multiple).
+
+       .find() is a function in all Mongoose models (like our Cat model). It takes
+       in an object as a parameter that defines the search. In this case, we want
+       to find every cat, so we give it an empty object because that will not filter
+       out any cats.
+
+       .lean() is a modifier for the find query. Instead of returning entire mongoose
+       documents, .lean() will only return the JS Objects being stored. Try printing
+       out docs with and without .lean() to see the difference.
+
+       .exec() executes the chain of operations. It is not strictly necessary and
+       can be removed. However, mongoose gives better error messages if we use it.
+    */
+    const docs = await Dog.find({}).lean().exec();
+
+    // Once we get back the docs array, we can send it to page1.
+    return res.render('page4', { dogs: docs });
+  } catch (err) {
+    /* If our database returns an error, or is unresponsive, we will print that error to
+       our console for us to see. We will also send back an error message to the client.
+
+       We don't want to send back the err from mongoose, as that would be unsafe. You
+       do not want people to see actual error messages from your server or database, or else
+       they can exploit them to attack your server.
+    */
+    console.log(err);
+    return res.status(500).json({ error: 'failed to find dogs' });
+  }
+};
 
 /* A function for updating the last cat added to the database.
    Usually database updates would be a more involved process, involving finding
@@ -309,4 +428,7 @@ module.exports = {
   updateLast,
   searchName,
   notFound,
+  createDog,
+  searchDog,
+  page4: hostPage4,
 };
